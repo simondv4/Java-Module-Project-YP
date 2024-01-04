@@ -1,4 +1,4 @@
-import java.util.Scanner; //вторая проверка
+import java.util.Scanner;
 
 public class Calc {
 
