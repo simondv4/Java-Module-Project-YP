@@ -1,3 +1,4 @@
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Calc {
@@ -5,40 +6,68 @@ public class Calc {
 
     public static int howManyPersons() {
         Scanner scanner = new Scanner(System.in);
-        int numberOfPersons = 0;
         System.out.println("На скольких людей разделить счет?");
         while(true){
-            numberOfPersons = scanner.nextInt();
-            if(numberOfPersons > 1) {
-                scanner.close();
-                break;
+            int numberOfPersons = 0;
+            try {
+                numberOfPersons = scanner.nextInt();
+            } catch (InputMismatchException e){
+                System.out.println("Некорректный ввод. Введите количество персон");
+                scanner.nextLine();
             }
-            System.out.println("Некорректный ввод. Введите количество персон");
+            if(numberOfPersons > 1) {
+                return numberOfPersons;
+            }
+            else {
+                System.out.println("Некорректный ввод. Введите количество персон");
+            }
         }
-        return numberOfPersons;
     }
 
 
+
     public static String getProduct() {
-        String encoding = System.getProperty("console.encoding", "utf-8");
         String priceList;
         priceList = "Добавленные товары:\n";
         String product = "";
         float price = 0f;
         float sum = 0f;
-        Scanner scanner = new Scanner(System.in, encoding);
+        int quantityPerson = howManyPersons();
+        Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("Введите название товара");
-            product = scanner.nextLine();
+            while(true) {
+                product = scanner.nextLine();
+                if(product.trim().length() == 0) {
+                    System.out.println("Кажется вы забыли ввести название товара, попробуйте ещё раз");
+                }
+                else {
+                    break;
+                }
+            }
             System.out.println("Введите стоимость товара");
-            price = scanner.nextFloat();
+            while(true) {
+                try {
+                    price = scanner.nextFloat();
+                } catch (InputMismatchException e) {
+                    System.out.println("Некорректный ввод. Введите стоимость товара");
+                    scanner.nextLine();
+                    continue;
+                }
+                if(price > 0) {
+                    break;
+                }
+                else {
+                    System.out.println("Некорректный ввод. Введите стоимость товара");
+                }
+            }
             scanner.nextLine();
-            priceList += String.format("%s - %.2f\n", product, price);
+            priceList += String.format("%s - %.2f %s\n", product, price, wordRuble(price));
             sum += price;
-            System.out.println("Товар успешно добавлен, если хотите завершить введите\"завершить\"");
+            System.out.println("Товар успешно добавлен, если хотите завершить введите \"завершить\"");
             if(scanner.nextLine().toLowerCase().equals("завершить")){
                 String ruble = wordRuble(sum);
-                sum = (sum / howManyPersons());
+                sum = (sum / quantityPerson);
                 priceList += String.format("Каждый должен заплатить %.2f %s\n ", sum, wordRuble(sum));
                 break;
             }
